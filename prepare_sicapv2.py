@@ -1,7 +1,7 @@
 import os
 import shutil
 import pandas as pd
-from sklearn.model_selection import train_test_split
+
 
 #in order to use pytorch imagefolder trainer we need file structure like this 
 #basically all im doing here is take the SICAPv2 partition tables (Val1 + Test) and physically organize the image files into the folder structure the CNN expects 
@@ -10,11 +10,12 @@ from sklearn.model_selection import train_test_split
 #edit these paths for ur personal machine
 
 #where you downloaded sicapv2
+#edit this line
 data_dir =  r"C:\Users\Peter\Desktop\Data\SICAPv2"
 
 #where the train/val/test split is 
 #you need a folder with Sicapv2_imagefolder contain train/test/val each of those files containing non_cancerous/gleason_3/gleason_4/gleason_5
-
+#edit this line 
 out_dir  = r"C:\Users\Peter\Desktop\SICAPv2_imagefolder"  
 
 #path to raw patch images 
@@ -74,6 +75,9 @@ def copy_split_rows(df, split_name):
         #just specified where that image should be copied to what folder in particular 
         src =  os.path.join(images_dir,  img_name) #where file is 
         dst_folder =  os.path.join(out_dir,  split_name, cls) #which split/class foldder 
+        #create split/class folders 
+        os.makedirs(dst_folder, exist_ok=True)
+
         dst =  os.path.join(dst_folder, img_name)#full dest path
 
 
@@ -83,7 +87,8 @@ def copy_split_rows(df, split_name):
 
 def main():
 
-
+    #create the root output folder 
+    os.makedirs(out_dir, exist_ok=True)
     print( "loading train/test tables")
 
     #read all excel files that define which images belong to which split
