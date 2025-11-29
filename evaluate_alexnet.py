@@ -24,7 +24,7 @@ DATA_DIR = r"C:\Users\Peter\Desktop\SICAPv2_imagefolder"
 
 #where the best model checkpoint was saved 
 OUTPUT_DIR = "checkpoints"
-CHECKPOINT_PATH = os.path.join(OUTPUT_DIR, "best_model.pt")
+CHECKPOINT_PATH = os.path.join(OUTPUT_DIR, "best_model_alexnet.pt")
 
 #basic hpyerparameters 
 BATCH_SIZE = 16 #how many images per batch    
@@ -33,17 +33,17 @@ NUM_WORKERS = 4  #number of dataloader worker processes
 
 def build_model(num_classes) :
     
-    #load resnet-50 w imagenet weights 
-    base = models.resnet50(weights =  models.ResNet50_Weights.IMAGENET1K_V1)
+    #load alexnet w imagenet weights 
+    base = models.alexnet(weights =  models.AlexNet_Weights.IMAGENET1K_V1)
 
     # numnber of features coming out of the oringinal final fc layer 
-    in_features = base.fc.in_features
+    in_features = base.classifier[6].in_features
 
     #replace the oringinal classification layer with identity
-    #basically replace the final fc layer with a nothing layer 
-    base.fc = nn.Identity()
+    #basically replace the final 1000-class head layer with a nothing layer 
+    base.classifier[6] = nn.Identity()
 
-    #our own classifier which maps resnet feature to num_classes 
+    #our own classifier which maps alexnet feature to num_classes 
     classifier = nn.Linear(in_features, num_classes)
 
 
@@ -140,7 +140,7 @@ def extract_features_pca(model, loader, class_names, device):
     features = []
     labels_list = []
 
-    # the first part of resnet
+    # the first part of alexnet
     backbone = model[0]
 
     #do not track gradients for testing 
@@ -183,13 +183,13 @@ def extract_features_pca(model, loader, class_names, device):
         #visitbiltiy = 0.7 
         plt.scatter(X_2d[idx, 0], X_2d[idx,1], s=8, label=class_names[cls_idx], alpha=0.7,) 
     
-    plt.title("PCA of ResNet features on SICAPv2 (test set)")
+    plt.title("PCA of AlexNet features on SICAPv2 (test set)")
     plt.xlabel("PC1")
     plt.ylabel("PC2")
     plt.legend()
 
     os.makedirs(OUTPUT_DIR, exist_ok=True)
-    out_path = os.path.join(OUTPUT_DIR, "feature_pca.png")
+    out_path = os.path.join(OUTPUT_DIR, "feature_pca_alexnet.png")
     plt.savefig(out_path, dpi = 200)
     plt.close()
 
@@ -205,10 +205,10 @@ def main():
     class_names = test_dataset.classes
     num_classes = len(class_names)
     
-    #rebuild model and load the trained weights from train_resnet 
+    #rebuild model and load the trained weights from train_alexnet 
     model = build_model(num_classes).to(device)
 
-    #use model trained in train_resnet.py
+    #use model trained in train_alexnet.py
     ckpt = torch.load(CHECKPOINT_PATH, map_location=device)
     model.load_state_dict(ckpt["model_state_dict"])
 
@@ -224,3 +224,4 @@ if __name__ == "__main__":
 
 
 
+ 
