@@ -4,10 +4,10 @@ import pandas as pd
 
 
 #in order to use pytorch imagefolder trainer we need file structure like this 
-#basically all im doing here is take the SICAPv2 partition tables (Val1 + Test) and physically organize the image files into the folder structure the CNN expects 
+#taking the SICAPv2 partition tables (Val1 + Test) and physically organizing the image files into the folder structure the CNN expects 
 
 
-#edit these paths for ur personal machine
+#edit these paths for your personal machine
 
 #where you downloaded sicapv2
 #edit this line
